@@ -115,44 +115,75 @@ export class JobRoleService {
     return await this.jobRoleRepo.save(newRole);
   }
 
-  async generateQuestions(dto: CreateQuestionDto): Promise<string> {
-    const prompt = `Generate ${dto.numberOfQuestions || 5} ${dto.difficulty || 'medium'} interview questions for the job role of ${dto.role}. Format the response in a numbered list.`;
+  async generateQuestions(dto: CreateQuestionDto): Promise<{ question: string; correctAnswer: string; hints: string[] }[]> {
+    try {
+      console.log('Received DTO:', dto);
+      console.log('Role from DTO:', dto.role);
+      
+      const apiKey = this.configService.get('OPENROUTER_API_KEY');
+      if (!apiKey) {
+        throw new Error('OPENROUTER_API_KEY is not configured. Please set the environment variable.');
+      }
 
-    const res = await axios.post(
-      this.apiUrl,
-      {
-        model: 'deepseek/deepseek-r1:free',
-        messages: [{ role: 'user', content: prompt }],
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${this.configService.get('OPENROUTER_API_KEY')}`,
-          'Content-Type': 'application/json',
-          'HTTP-Referer': 'http://localhost:3001',
-          'X-Title': 'AI Interview Question Generator',
+      const prompt = `Generate ${dto.numberOfQuestions || 5} ${dto.difficulty || 'medium'} interview questions for the job role of ${dto.role}. 
+      
+      Requirements:
+      - Return only the questions, one per line
+      - Do not include numbering or bullet points
+      - Make questions specific to the role
+      - Include a mix of technical and behavioral questions
+      - Each question should be clear and concise
+      - Focus on real-world scenarios and practical knowledge
+      
+      Format: Return each question on a separate line without any numbering.`;
+
+      console.log('Calling DeepSeek API with prompt:', prompt);
+
+      const res = await axios.post(
+        this.apiUrl,
+        {
+          model: 'deepseek/deepseek-r1:free',
+          messages: [{ role: 'user', content: prompt }],
         },
-      },
-    );
+        {
+          headers: {
+            Authorization: `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
+            'HTTP-Referer': 'http://localhost:3001',
+            'X-Title': 'AI Interview Question Generator',
+          },
+        },
+      );
 
-    const content = res.data.choices[0]?.message?.content || 'No response';
+      const content = res.data.choices[0]?.message?.content || 'No response';
+      console.log('DeepSeek API response:', content);
 
-    let user = await this.userRepo.findOne({ where: { email: 'demo@example.com' } });
-    if (!user) {
-      user = await this.userRepo.save({ email: 'demo@example.com' });
+      // Parse questions from response
+      const questions = content
+        .split('\n')
+        .map(line => line.trim())
+        .filter(line => line.length > 0 && !line.match(/^\d+\./)) // Remove numbered lines
+        .slice(0, dto.numberOfQuestions || 5);
+
+      console.log('Parsed questions:', questions);
+
+      // For now, return questions without generating answers to make it faster
+      // TODO: Implement answer generation in a separate endpoint
+      const questionsWithAnswers = questions.map((question) => ({
+        question,
+        correctAnswer: 'A comprehensive answer would cover the key aspects of this question. Consider the role requirements, best practices, and provide specific examples.',
+        hints: ['Consider the context', 'Think about best practices', 'Provide specific examples']
+      }));
+
+      console.log('Generated questions with answers:', questionsWithAnswers.length);
+
+      // For now, just return the questions without saving to database
+      // TODO: Save questions to database when user authentication is properly implemented
+      return questionsWithAnswers;
+    } catch (error) {
+      console.error('Error generating questions with DeepSeek:', error);
+      throw new Error(`Failed to generate questions: ${error.message}`);
     }
-
-    // 💾 Save each question
-    const lines = content.split('\n').filter((line) => line.trim());
-    for (const line of lines) {
-      await this.questionRepo.save({
-        role: dto.role,
-        difficulty: dto.difficulty || 'medium',
-        content: line.trim(),
-        user,
-      });
-    }
-
-    return content;
   }
 
   async generateSingleQuestion(dto: CreateQuestionDto): Promise<{ question: string | null; questionNumber: number; totalQuestions: number }> {

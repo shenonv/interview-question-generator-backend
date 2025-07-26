@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get } from '@nestjs/common';
+import { Controller, Post, Body, Get, Req } from '@nestjs/common';
 import { JobRoleService } from './job-role.service';
 import { CreateQuestionDto, GetNextQuestionDto } from './dto/create-question.dto';
 import { EvaluateAnswerDto } from './dto/evaluate-answer.dto';
@@ -25,9 +25,27 @@ export class JobRoleController {
   }
 
   @Post('questions')
-  async generateQuestions(@Body() dto: CreateQuestionDto) {
-    const questions = await this.jobRoleService.generateQuestions(dto);
-    return { questions };
+  async generateQuestions(@Body() dto: CreateQuestionDto, @Req() req: any) {
+    try {
+      console.log('🔍 Controller received DTO:', JSON.stringify(dto, null, 2));
+      console.log('🔍 Role from DTO:', dto.role);
+      console.log('🔍 DTO type:', typeof dto.role);
+      console.log('🔍 DTO keys:', Object.keys(dto));
+      console.log('🔍 Raw request body:', JSON.stringify(dto, null, 2));
+      console.log('🔍 Is dto empty?', Object.keys(dto).length === 0);
+      console.log('🔍 Raw request body from req:', req.body);
+      console.log('🔍 Request headers:', req.headers);
+      console.log('🔍 Content-Type:', req.headers['content-type']);
+      
+      const questions = await this.jobRoleService.generateQuestions(dto);
+      return { questions };
+    } catch (error) {
+      console.error('Error in generateQuestions controller:', error);
+      return { 
+        questions: [], 
+        error: error.message || 'Failed to generate questions' 
+      };
+    }
   }
 
   @Post('question')
