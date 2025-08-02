@@ -19,10 +19,6 @@ export class RegisterDto {
 
   @IsString()
   fullName: string;
-
-  @IsOptional()
-  @IsString()
-  avatar?: string;
 }
 
 export class AuthResponseDto {
@@ -31,6 +27,5 @@ export class AuthResponseDto {
     id: number;
     email: string;
     fullName: string;
-    avatar?: string;
   };
 } 

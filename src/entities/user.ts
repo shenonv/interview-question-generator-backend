@@ -15,9 +15,6 @@ export class User {
   @Column()
   fullName: string;
 
-  @Column({ nullable: true })
-  avatar: string;
-
   @Column({ default: true })
   isActive: boolean;
 

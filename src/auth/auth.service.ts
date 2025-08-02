@@ -15,7 +15,7 @@ export class AuthService {
   ) {}
 
   async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
-    const { email, password, fullName, avatar } = registerDto;
+    const { email, password, fullName } = registerDto;
 
     // Check if user already exists
     const existingUser = await this.userRepository.findOne({ where: { email } });
@@ -31,7 +31,6 @@ export class AuthService {
       email,
       password: hashedPassword,
       fullName,
-      avatar,
     });
 
     const savedUser = await this.userRepository.save(user);
@@ -51,7 +50,6 @@ export class AuthService {
         id: savedUser.id,
         email: savedUser.email,
         fullName: savedUser.fullName,
-        avatar: savedUser.avatar,
       },
     };
   }
@@ -91,7 +89,6 @@ export class AuthService {
         id: user.id,
         email: user.email,
         fullName: user.fullName,
-        avatar: user.avatar,
       },
     };
   }
@@ -105,7 +102,6 @@ export class AuthService {
       id: user.id,
       email: user.email,
       fullName: user.fullName,
-      avatar: user.avatar,
     };
   }
 } 
