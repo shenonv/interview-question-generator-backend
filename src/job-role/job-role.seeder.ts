@@ -63,7 +63,7 @@ export class JobRoleSeeder {
     try {
       console.log('Starting job roles seeding...');
       
-      // Check if roles already exist
+      // Check if roles already exist in the database
       const existingRoles = await this.jobRoleRepo.find();
       
       if (existingRoles.length > 0) {
@@ -79,7 +79,7 @@ export class JobRoleSeeder {
         role.isCustom = false;
         role.description = `Default job role: ${name}`;
         return role;
-      });
+      });  
 
       // Save to database
       await this.jobRoleRepo.save(jobRoleEntities);
