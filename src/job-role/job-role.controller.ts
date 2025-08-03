@@ -27,17 +27,18 @@ export class JobRoleController {
   @Post('questions')
   async generateQuestions(@Body() dto: CreateQuestionDto, @Req() req: any) {
     try {
-      console.log('🔍 Controller received DTO:', JSON.stringify(dto, null, 2));
-      console.log('🔍 Role from DTO:', dto.role);
-      console.log('🔍 DTO type:', typeof dto.role);
-      console.log('🔍 DTO keys:', Object.keys(dto));
-      console.log('🔍 Raw request body:', JSON.stringify(dto, null, 2));
-      console.log('🔍 Is dto empty?', Object.keys(dto).length === 0);
-      console.log('🔍 Raw request body from req:', req.body);
-      console.log('🔍 Request headers:', req.headers);
-      console.log('🔍 Content-Type:', req.headers['content-type']);
+      console.log(' Controller received DTO:', JSON.stringify(dto, null, 2));
+      console.log(' Role from DTO:', dto.role);
+      console.log(' DTO type:', typeof dto.role);
+      console.log(' DTO keys:', Object.keys(dto));
+      console.log(' Raw request body:', JSON.stringify(dto, null, 2));
+      console.log(' Is dto empty?', Object.keys(dto).length === 0);
+      console.log(' Raw request body from req:', req.body);
+      console.log(' Request headers:', req.headers);
+      console.log(' Content-Type:', req.headers['content-type']);
       
       const questions = await this.jobRoleService.generateQuestions(dto);
+      console.log('Controller returning questions:', questions.length);
       return { questions };
     } catch (error) {
       console.error('Error in generateQuestions controller:', error);
@@ -46,12 +47,6 @@ export class JobRoleController {
         error: error.message || 'Failed to generate questions' 
       };
     }
-  }
-
-  @Post('question')
-  async generateSingleQuestion(@Body() dto: CreateQuestionDto) {
-    const result = await this.jobRoleService.generateSingleQuestion(dto);
-    return result;
   }
 
   @Post('next-question')

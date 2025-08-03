@@ -32,7 +32,8 @@ export class AuthService {
       password: hashedPassword,
       fullName,
     });
-
+ 
+    //save new user
     const savedUser = await this.userRepository.save(user);
 
     // Generate JWT token
