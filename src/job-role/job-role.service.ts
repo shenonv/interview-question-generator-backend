@@ -310,7 +310,8 @@ Question: ${question}
 
 Answer: ${userAnswer}
 
-Provide a constructive evaluation with strengths, weaknesses, and suggestions for improvement in 4 sentences.`;
+Provide a constructive evaluation with strengths, weaknesses, and suggestions for improvement. Your response must be exactly 4 sentences—no more, no less.`;
+
 
     // Rate limiting to prevent overwhelming the AI API
     const now = Date.now();
