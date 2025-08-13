@@ -304,13 +304,13 @@ export class JobRoleService {
     console.log('Evaluating answer for question:', question.substring(0, 50) + '...');
     console.log('User answer:', userAnswer.substring(0, 50) + '...');
     
-    const prompt = `You are an expert interviewer. Evaluate the following answer for a candidate applying as ${role || 'a software engineer'}.
+    const prompt = `You are an expert interviewer Your response must be exactly 4 sentences no more, no less.. Evaluate the following answer for a candidate applying as ${role || 'a software engineer'}.
 
 Question: ${question}
 
 Answer: ${userAnswer}
 
-Provide a constructive evaluation with strengths, weaknesses, and suggestions for improvement. Your response must be exactly 4 sentences—no more, no less.`;
+Provide a constructive evaluation with strengths, weaknesses, and suggestions for improvement.`;
 
 
     // Rate limiting to prevent overwhelming the AI API
